@@ -3,21 +3,21 @@ const validNumber = 12345678910
 const transactionData = []
 
 // functions to get input values
-function getInputValueNumber (id){
+function getInputValueNumber(id) {
     const inputField = document.getElementById(id)
     const inputFieldValue = inputField.value
     const inputFieldValueNumber = parseInt(inputFieldValue)
     return inputFieldValueNumber;
 }
 
-function getInputValue(id){
+function getInputValue(id) {
     const inputField = document.getElementById(id)
     const inputFieldValue = inputField.value
     return inputFieldValue
 }
 
 // function to get innertext
-function getInnerText(id){
+function getInnerText(id) {
     const element = document.getElementById(id);
     const elementValue = element.innerText;
     const elementValueNumber = parseInt(elementValue);
@@ -25,7 +25,7 @@ function getInnerText(id){
 }
 
 // function to set innerText
-function setInnerText(value){
+function setInnerText(value) {
     const availableBalanceElement = document.getElementById("available-balance")
     availableBalanceElement.innerText = value
 }
@@ -33,35 +33,35 @@ function setInnerText(value){
 //function to toggle
 function handleToggle(id) {
     const forms = document.getElementsByClassName("form")
-    for(const form of forms){
+    for (const form of forms) {
         form.style.display = "none"
     }
     document.getElementById(id).style.display = "block"
 }
 
 //function to toggle buttons
-function handleButtonToggle(id){
+function handleButtonToggle(id) {
     const formBtns = document.getElementsByClassName("form-btn")
- 
-    for(const btn of formBtns){
-        btn.classList.remove("border-[#0874f2]","bg-[#0874f20d]")
+
+    for (const btn of formBtns) {
+        btn.classList.remove("border-[#0874f2]", "bg-[#0874f20d]")
         btn.classList.add("border-gray-300")
     }
 
     document.getElementById(id).classList.remove("border-gray-300")
-    document.getElementById(id).classList.add("border-[#0874f2]","bg-[#0874f20d]")
+    document.getElementById(id).classList.add("border-[#0874f2]", "bg-[#0874f20d]")
 }
 
 // add money features 
 document.getElementById("add-money-btn").addEventListener("click", function (e) {
     e.preventDefault();
-    const bank =  getInputValue("bank");
+    const bank = getInputValue("bank");
     const accountNumber = document.getElementById("account-number").value;
     const amount = getInputValueNumber("add-amount");
     const pinNumber = getInputValueNumber("add-pin");
 
 
-    if (accountNumber.length != 11){
+    if (accountNumber.length != 11) {
         alert("Please Provide valid Account Number")
         return;
     }
@@ -77,12 +77,12 @@ document.getElementById("add-money-btn").addEventListener("click", function (e) 
     const availableBalance = getInnerText("available-balance");
 
     const totalNewAvailableBalance = amount + availableBalance;
-    
+
     setInnerText(totalNewAvailableBalance);
 
     const data = {
-        name:"Add Money",
-        date:new Date().toLocaleTimeString()
+        name: "Add Money",
+        date: new Date().toLocaleTimeString()
     }
     transactionData.push(data);
 })
@@ -95,34 +95,163 @@ document.getElementById("withdraw-btn").addEventListener("click", function (e) {
     e.preventDefault();
 
     const amount = getInputValueNumber("withdraw-amount");
-
+    const agentNumber = getInputValue("agent-no")
+    const pinNo = getInputValueNumber("withdrew-pin");
     const availableBalance = getInnerText("available-balance");
 
-    if(amount <= 0 || amount>availableBalance){
+    if (agentNumber.length !== 11) {
+        alert("Invalid agent number");
+        return;
+    }
+    if (pinNo !== 7733) {
+        alert("Input Correct Pin Number");
+        return
+    }
+
+    if (amount <= 0 || isNaN(amount)) {
         alert("Invalid Amount");
+        return;
+    }
+    if (amount > availableBalance) {
+        alert("You cannot withdraw more than you available balance");
+        return;
+    }
+    if (availableBalance === 0) {
+        alert("Your Balance is 0");
         return;
     }
 
     const totalNewAvailableBalance = availableBalance - amount;
-    
+
     setInnerText(totalNewAvailableBalance);
 
     const data = {
-        name:"Cash Out",
-        date:new Date().toLocaleTimeString()
+        name: "Cash Out",
+        date: new Date().toLocaleTimeString()
     }
 
     transactionData.push(data);
 })
 
-//transactions adding
-document.getElementById("transactions-button").addEventListener("click",function(){
+//transfer functionality
+document.getElementById("transfer-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+    const accNo = getInputValue("user-no-transfer");
+    const amount = getInputValueNumber("transfer-amount");
+    const pinNo = getInputValueNumber("transfer-pin")
+
+    const availableBalance = getInnerText("available-balance");
+
+    if (accNo.length !== 11) {
+        alert("Invalid user number");
+        return;
+    }
+    if (pinNo !== 7733) {
+        alert("Input Correct Pin Number");
+        return
+    }
+
+    if (amount <= 0 || isNaN(amount)) {
+        alert("Invalid Amount");
+        return;
+    }
+    if (amount > availableBalance) {
+        alert("You cannot transfer more than you available balance");
+        return;
+    }
+    if (availableBalance === 0) {
+        alert("Your Balance is 0");
+        return;
+    }
+
+    const totalNewAvailableBalance = availableBalance - amount;
+
+    setInnerText(totalNewAvailableBalance);
+
+    const data = {
+        name: "Transfer Money",
+        date: new Date().toLocaleTimeString()
+    }
+
+    transactionData.push(data);
+
+})
+
+
+//get bonus functionality
+document.getElementById("bonus-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+    const cupon = getInputValue("cupon-code")
+    if(cupon !== "hasnat-999"){
+        alert("Please insert a valid cupon code")
+        return;
+    }
+    const totalAvailableBalance = getInnerText("available-balance");
+    alert("Congratulations! You have received a bonus of $500")
+    const totalNewAvailableBalance = totalAvailableBalance + 500;
+    setInnerText(totalNewAvailableBalance);
+    
+
+    const data = {
+        name: "Get Bonus",
+        date: new Date().toLocaleTimeString()
+    }
+
+    transactionData.push(data);
+
+    
+})
+
+//bill functionality
+document.getElementById("bill-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+    const bank = getInputValue("bill-bank");
+    const accountNumber = document.getElementById("bill-account-number").value;
+    const amount = getInputValueNumber("bill-amount");
+    const pinNumber = getInputValueNumber("bill-pin");
+
+    const availableBalance = getInnerText("available-balance");
+
+
+    if (accountNumber.length != 11) {
+        alert("Please Provide valid Account Number")
+        return;
+    }
+    if (pinNumber !== validPin) {
+        alert("Please Provide Correct Pin Number")
+        return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please Provide a valid amount")
+        return;
+    }
+
+    if(amount > availableBalance){
+        alert("You cannot withdraw more than you available balance");
+        return;
+    }
+    
+
+    const totalNewAvailableBalance =  availableBalance - amount ;
+
+    setInnerText(totalNewAvailableBalance);
+
+    const data = {
+        name: "Bill Payment",
+        date: new Date().toLocaleTimeString()
+    }
+    transactionData.push(data);
+})
+
+
+//transactions functionality
+document.getElementById("transactions-button").addEventListener("click", function () {
     const transactionContainer = document.getElementById("transaction-container")
     transactionContainer.innerText = ""
 
-    for(const data of transactionData){
+    for (const data of transactionData) {
         const div = document.createElement("div")
-        div.innerHTML=`
+        div.innerHTML = `
         <div class=" bg-white rounded-xl p-3 flex justify-between items-center mt-3">
               <div class="flex items-center">
                   <div class="p-3 rounded-full bg-[#f4f5f7]">
@@ -165,17 +294,17 @@ document.getElementById("bonus-button").addEventListener("click", function () {
     handleButtonToggle("bonus-button")
 })
 
-document.getElementById("bill-button").addEventListener("click",function(){
+document.getElementById("bill-button").addEventListener("click", function () {
     handleToggle("pay-bill-parent")
     handleButtonToggle("bill-button")
 })
-document.getElementById("transactions-button").addEventListener("click",function(){
+document.getElementById("transactions-button").addEventListener("click", function () {
     handleToggle("transactions-parent")
     handleButtonToggle("transactions-button")
 })
 
 
 //logout
-document.getElementById("logout-btn").addEventListener("click", function(){
+document.getElementById("logout-btn").addEventListener("click", function () {
     window.location.href = "./index.html"
 })
